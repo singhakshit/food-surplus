@@ -1,19 +1,25 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Home from './pages/Home'; // Points directly to your new file
 
-// Temporary placeholder components for layout visualization
-const Home = () => <div style={{ padding: '20px' }}><h2>Welcome to Food Surplus App</h2><p>Select your role to log in.</p></div>;
-const DonorDashboard = () => <div style={{ padding: '20px' }}><h2>Donor Dashboard</h2><p>Post food surplus here.</p></div>;
-const RecipientMap = () => <div style={{ padding: '20px' }}><h2>Recipient Map View</h2><p>Nearby food listings will appear here.</p></div>;
+// Temporary placeholders for our next features
+const DonorDashboard = () => <div className="p-10"><h2>Donor Portal</h2><p>Form coming soon...</p></div>;
+const RecipientMap = () => <div className="p-10"><h2>Recipient Map View</h2><p>Map engine coming soon...</p></div>;
 
 function App() {
   return (
     <Router>
-      <nav style={{ padding: '15px', background: '#fff', borderBottom: '1px solid #ddd', display: 'flex', gap: '15px' }}>
-        <Link to="/" style={{ fontWeight: 'bold', textDecoration: 'none', color: '#2b8a3e' }}>🥗 SurplusShare</Link>
-        <Link to="/donor">Donor Portal</Link>
-        <Link to="/recipient">Recipient Map</Link>
+      {/* Global Navigation Bar */}
+      <nav className="flex justify-between items-center p-4 bg-white border-b border-gray-100 shadow-sm">
+        <Link to="/" className="font-bold text-xl text-green-600 no-underline">
+          🥗 SurplusShare
+        </Link>
+        <div className="flex gap-6">
+          <Link to="/donor" className="text-gray-600 hover:text-green-600 no-underline font-medium">Donor Portal</Link>
+          <Link to="/recipient" className="text-gray-600 hover:text-green-600 no-underline font-medium">Find Food</Link>
+        </div>
       </nav>
 
+      {/* URL Route Switcher */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/donor" element={<DonorDashboard />} />
