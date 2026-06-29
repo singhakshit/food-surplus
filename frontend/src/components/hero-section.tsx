@@ -1,7 +1,12 @@
+"use client";
+
 import { Button } from "./ui/button";
 import { ArrowRight, Heart, Users } from "lucide-react";
+import { useState } from "react";
+import { DonorForm } from "./donor-form";
 
 export function HeroSection() {
+  const [showDonorForm, setShowDonorForm] = useState(false);
   return (
     <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
       {/* Background gradient */}
@@ -31,7 +36,11 @@ export function HeroSection() {
 
           {/* CTA Buttons */}
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="w-full sm:w-auto text-base px-8 h-12">
+            <Button 
+              size="lg" 
+              className="w-full sm:w-auto text-base px-8 h-12"
+              onClick={() => setShowDonorForm(true)}
+            >
               Start Donating
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
@@ -63,6 +72,8 @@ export function HeroSection() {
           </div>
         </div>
       </div>
+
+      <DonorForm isOpen={showDonorForm} onClose={() => setShowDonorForm(false)} />
     </section>
   );
 }
