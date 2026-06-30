@@ -1,20 +1,12 @@
 "use client";
 
+import { Link } from 'react-router-dom';
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { ArrowRight, Building2, Heart, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 
-interface PortalCardProps {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  features: string[];
-  buttonText: string;
-  variant: "donor" | "recipient";
-}
-
-function PortalCard({ title, description, icon, features, buttonText, variant }: PortalCardProps) {
+function PortalCard({ title, description, icon, features, buttonText, variant }) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -62,15 +54,19 @@ function PortalCard({ title, description, icon, features, buttonText, variant }:
           ))}
         </ul>
 
+        {/* Wrapped Button in React Router Link for routing functionality */}
         <Button 
-          className={`w-full h-12 text-base ${
+          className={`w-full h-12 text-base font-medium ${
             variant === "donor" 
-              ? "" 
+              ? "bg-green-700 hover:bg-green-800 text-white" 
               : "bg-accent hover:bg-accent/90 text-accent-foreground"
           }`}
+          asChild
         >
-          {buttonText}
-          <ArrowRight className="ml-2 w-4 h-4" />
+          <Link to="/login" className="flex items-center justify-center gap-2 no-underline">
+            <span>{buttonText}</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </Button>
       </CardContent>
     </Card>
@@ -90,7 +86,7 @@ export function PortalsSection() {
         "Join a network of sustainable businesses",
       ],
       buttonText: "Sign In as Donor",
-      variant: "donor" as const,
+      variant: "donor",
     },
     {
       title: "Recipient Portal",
@@ -103,7 +99,7 @@ export function PortalsSection() {
         "Connect with local food donors",
       ],
       buttonText: "Sign In as Recipient",
-      variant: "recipient" as const,
+      variant: "recipient",
     },
   ];
 

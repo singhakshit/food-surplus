@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabaseClient';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [isSignUp, setIsSignUp] = useState(false); // Toggles between Sign In and Sign Up views
+  const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   
   // Form States
@@ -13,42 +13,38 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
 
-  // 1. Handle Email & Password Authentication (Sign In / Sign Up)
   const handleEmailAuth = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       if (isSignUp) {
-        // --- SIGN UP LOGIC ---
-        const {  error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: {
-              full_name: fullName, // Saves the profile name to Supabase
+              full_name: fullName,
             },
           },
         });
         if (error) throw error;
-        alert('🎉 Account created! Please check your email for a verification link.');
+        navigate('/');
       } else {
-        // --- SIGN IN LOGIC ---
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
-        navigate('/'); // Redirect to homepage on success
+        navigate('/');
       }
     } catch (error) {
-      alert(error.message);
+      alert(error.message + ': Please sign up first');
     } finally {
       setLoading(false);
     }
   };
 
-  // 2. Handle Google OAuth Authentication
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
@@ -67,10 +63,10 @@ export default function Login() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[85vh] bg-background px-4">
-      <div className="max-w-md w-full p-8 bg-white rounded-xl shadow-sm border border-gray-100 text-left">
+    // Replaced min-h-[85vh] and bg-background with standard viewport offsets and solid color layouts
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 pt-20 px-4">
+      <div className="max-w-md w-full p-8 bg-white rounded-xl shadow-md border border-slate-100 text-left">
         
-        {/* Dynamic Title Headers */}
         <h2 className="text-3xl font-bold text-slate-900 mb-1">
           {isSignUp ? 'Join FoodShare' : 'Welcome Back'}
         </h2>
@@ -80,10 +76,7 @@ export default function Login() {
             : 'Sign in to your account to continue'}
         </p>
 
-        {/* Input Form Wrapper */}
         <form onSubmit={handleEmailAuth} className="space-y-4">
-          
-          {/* Full Name Field (Only renders if in Sign Up Mode) */}
           {isSignUp && (
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
@@ -92,8 +85,7 @@ export default function Login() {
                 <input
                   type="text"
                   required
-                  placeholder="John Doe"
-                  className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent bg-slate-50 text-slate-900"
+                  className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 bg-white text-slate-900"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                 />
@@ -101,7 +93,6 @@ export default function Login() {
             </div>
           )}
 
-          {/* Email Input Field */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
             <div className="relative">
@@ -110,14 +101,13 @@ export default function Login() {
                 type="email"
                 required
                 placeholder="you@example.com"
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent bg-slate-50 text-slate-900"
+                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 bg-white text-slate-900"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
           </div>
 
-          {/* Password Input Field */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
             <div className="relative">
@@ -126,14 +116,13 @@ export default function Login() {
                 type="password"
                 required
                 placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent bg-slate-50 text-slate-900"
+                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 bg-white text-slate-900"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </div>
 
-          {/* Submit Action Button */}
           <button
             type="submit"
             disabled={loading}
@@ -143,7 +132,6 @@ export default function Login() {
           </button>
         </form>
 
-        {/* Separator Line */}
         <div className="relative my-6 text-center">
           <hr className="border-slate-200" />
           <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-xs text-slate-400 uppercase tracking-wider">
@@ -151,7 +139,6 @@ export default function Login() {
           </span>
         </div>
 
-        {/* Google Authentication Button */}
         <button
           onClick={handleGoogleLogin}
           disabled={loading}
@@ -166,19 +153,18 @@ export default function Login() {
           Sign in with Google
         </button>
 
-        {/* Bottom Navigation Toggle */}
         <div className="mt-6 text-center text-sm text-slate-600">
           {isSignUp ? (
             <>
               Already have an account?{' '}
-              <button onClick={() => setIsSignUp(false)} className="text-green-700 font-semibold hover:underline bg-transparent border-none p-0">
+              <button type="button" onClick={() => setIsSignUp(false)} className="text-green-700 font-semibold hover:underline bg-transparent border-none p-0 cursor-pointer">
                 Sign in
               </button>
             </>
           ) : (
             <>
               Don't have an account?{' '}
-              <button onClick={() => setIsSignUp(true)} className="text-green-700 font-semibold hover:underline bg-transparent border-none p-0">
+              <button type="button" onClick={() => setIsSignUp(true)} className="text-green-700 font-semibold hover:underline bg-transparent border-none p-0 cursor-pointer">
                 Sign up
               </button>
             </>

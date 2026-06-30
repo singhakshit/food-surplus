@@ -7,9 +7,9 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { X, Plus } from "lucide-react";
+import { supabase } from '../lib/supabaseClient';
 
-
-export function DonorForm({ isOpen, onClose }) {
+export default function DonorForm({ isOpen, onClose, session}) {
   const [formData, setFormData] = useState({
     foodDescription: "",
     quantity: "",
@@ -31,14 +31,21 @@ export function DonorForm({ isOpen, onClose }) {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // TODO: Send form data to backend
-    console.log("[v0] Donation form submitted:", formData);
-
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const { error } = await supabase
+        .from('donations')
+        .insert([
+          {
+            food_type: formData.foodDescription,
+            quantity: formData.quantity,
+            expiration_time: formData.expirationTime,
+            pickup_location: formData.pickupAddress,
+            email: session?.user?.email || null,
+          },
+        ]);
 
-      // Reset form
+      if (error) throw error;
+
       setFormData({
         foodDescription: "",
         quantity: "",
@@ -46,14 +53,11 @@ export function DonorForm({ isOpen, onClose }) {
         expirationTime: "",
       });
 
-      // Close form
       onClose();
-
-      // Show success message (you can add a toast notification here)
-      alert("Thank you for your donation! Our team will contact you soon.");
+      alert("🎉 Thank you for your donation! Your surplus food has been logged on Supabase.");
     } catch (error) {
-      console.error("[v0] Error submitting donation:", error);
-      alert("Error submitting donation. Please try again.");
+      console.error("Error submitting donation to Supabase:", error);
+      alert("Error submitting donation to Supabase database: " + error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -81,7 +85,6 @@ export function DonorForm({ isOpen, onClose }) {
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Food Description */}
             <div className="space-y-2">
               <Label htmlFor="foodDescription" className="text-base font-medium">
                 Food Description
@@ -97,7 +100,6 @@ export function DonorForm({ isOpen, onClose }) {
               />
             </div>
 
-            {/* Quantity */}
             <div className="space-y-2">
               <Label htmlFor="quantity" className="text-base font-medium">
                 Quantity
@@ -113,7 +115,6 @@ export function DonorForm({ isOpen, onClose }) {
               />
             </div>
 
-            {/* Pickup Address */}
             <div className="space-y-2">
               <Label htmlFor="pickupAddress" className="text-base font-medium">
                 Pickup Address
@@ -129,7 +130,6 @@ export function DonorForm({ isOpen, onClose }) {
               />
             </div>
 
-            {/* Expiration Time */}
             <div className="space-y-2">
               <Label htmlFor="expirationTime" className="text-base font-medium">
                 Expiration Date & Time
@@ -144,7 +144,6 @@ export function DonorForm({ isOpen, onClose }) {
               />
             </div>
 
-            {/* Submit Button */}
             <div className="flex gap-3 pt-4">
               <Button
                 type="button"

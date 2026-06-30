@@ -1,13 +1,12 @@
 "use client";
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "./ui/button";
 import { Leaf, Menu, X } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 
-export function Header({ session }: { session: any }) {
+export function Header({ session }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -69,7 +68,7 @@ export function Header({ session }: { session: any }) {
               Portals
             </a>
 
-            {/* Added visibility to Donor Portal link if logged in */}
+            {/* Display Donor Dashboard link dynamically if logged in */}
             {session && (
               <Link to="/donor" className="text-muted-foreground hover:text-foreground transition-colors text-sm font-medium no-underline">
                 Donor Portal
@@ -77,7 +76,7 @@ export function Header({ session }: { session: any }) {
             )}
           </nav>
 
-          {/* Desktop Auth Section */}
+          {/* Desktop Auth Toggle Section */}
           <div className="hidden md:flex items-center gap-4">
             {session ? (
               <div className="flex items-center gap-3">
@@ -156,7 +155,7 @@ export function Header({ session }: { session: any }) {
               </Link>
             )}
 
-            {/* Mobile Auth Buttons */}
+            {/* Mobile Auth Section */}
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
               {session ? (
                 <div className="flex flex-col gap-2">

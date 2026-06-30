@@ -1,28 +1,60 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import Home from './pages/Home'; // Points directly to your new file
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { supabase } from './lib/supabaseClient';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import DonorForm from './components/donor-form';
 
-// Temporary placeholders for our next features
-const DonorDashboard = () => <div className="p-10"><h2>Donor Portal</h2><p>Form coming soon...</p></div>;
-const RecipientMap = () => <div className="p-10"><h2>Recipient Map View</h2><p>Map engine coming soon...</p></div>;
+const RecipientMap = () => (
+  <div className="p-24 text-center">
+    <h2 className="text-2xl font-bold">Recipient Map View</h2>
+    <p className="text-slate-500 mt-2">Map engine coming soon...</p>
+  </div>
+);
 
 function App() {
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-slate-500 font-medium bg-slate-50">
+        Loading SurplusShare...
+      </div>
+    );
+  }
+
   return (
     <Router>
-      {/* Global Navigation Bar */}
-      <nav className="flex justify-between items-center p-4 bg-white border-b border-gray-100 shadow-sm">
-        <Link to="/" className="font-bold text-xl text-green-600 no-underline">
-          🥗 SurplusShare
-        </Link>
-        <div className="flex gap-6">
-          <Link to="/donor" className="text-gray-600 hover:text-green-600 no-underline font-medium">Donor Portal</Link>
-          <Link to="/recipient" className="text-gray-600 hover:text-green-600 no-underline font-medium">Find Food</Link>
-        </div>
-      </nav>
-
-      {/* URL Route Switcher */}
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/donor" element={<DonorDashboard />} />
+        {/* Main Home Page Route - We pass down the session state here */}
+        <Route path="/" element={<Home session={session} />} />
+        
+        {/* Unified Sign In / Sign Up Custom Route */}
+        <Route path="/login" element={<Login />} />
+        
+        {/* Protected Donor Dashboard Route */}
+        <Route 
+          path="/donor" 
+          element={session ? <DonorForm session={session} /> : <Navigate to="/login" />} 
+        />
+        
+        {/* Recipient Route */}
         <Route path="/recipient" element={<RecipientMap />} />
       </Routes>
     </Router>
