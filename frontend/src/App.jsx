@@ -4,13 +4,14 @@ import { supabase } from './lib/supabaseClient';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import DonorForm from './components/donor-form';
+import RecipientDashboard from './pages/RecipientDashboard';
 
-const RecipientMap = () => (
-  <div className="p-24 text-center">
-    <h2 className="text-2xl font-bold">Recipient Map View</h2>
-    <p className="text-slate-500 mt-2">Map engine coming soon...</p>
-  </div>
-);
+// const RecipientMap = () => (
+//   <div className="p-24 text-center">
+//     <h2 className="text-2xl font-bold">Recipient Map View</h2>
+//     <p className="text-slate-500 mt-2">Map engine coming soon...</p>
+//   </div>
+// );
 
 function App() {
   const [session, setSession] = useState(null);
@@ -55,7 +56,7 @@ function App() {
         />
         
         {/* Recipient Route */}
-        <Route path="/recipient" element={<RecipientMap />} />
+        <Route path="/recipient" element={<RecipientDashboard  />} />
       </Routes>
     </Router>
   );

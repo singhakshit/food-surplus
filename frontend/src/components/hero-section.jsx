@@ -52,7 +52,11 @@ export function HeroSection({ session }) {
               Start Donating
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
-            <Button variant="outline" size="lg" className="w-full sm:w-auto text-base px-8 h-12">
+            <Button  variant="outline" 
+              size="lg" 
+              className="w-full sm:w-auto text-base px-8 h-12"
+              onClick={() => navigate("/recipient")}
+            >
               Find Food Near You
             </Button>
           </div>
