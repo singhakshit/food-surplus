@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { MapPin, Clock, ShieldAlert, Package, CheckCircle } from 'lucide-react';
 
 export default function RecipientDashboard() {
+  const navigate = useNavigate();
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -67,21 +69,30 @@ export default function RecipientDashboard() {
   }, []);
 
   // 4. Handle Claim Action Mutation
-  const handleClaimDonation = async (donationId) => {
-    try {
-      const { error } = await supabase
-        .from('donations')
-        .update({ status: 'claimed' })
-        .eq('id', donationId);
-
-      if (error) throw error;
-
-      alert(' Food item successfully claimed! Coordinate your collection logistics.');
-    } catch (error) {
-      console.error('Error claiming donation:', error);
-      alert('Could not claim item: ' + error.message);
+ const handleClaimDonation = async (donationId) => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      alert(" Secure Access: Please sign in or register an account to claim community food donations.");
+      navigate("/login");
+      return;
     }
-  };
+    const { error } = await supabase
+      .from('donations')
+      .update({ 
+        status: 'claimed',
+        claimed_by: session.user.email // Optional: logs exactly who claimed it!
+      })
+      .eq('id', donationId);
+
+    if (error) throw error;
+
+    alert('🎉 Food item successfully claimed! Coordinate your collection logistics.');
+  } catch (error) {
+    console.error('Error claiming donation:', error);
+    alert('Could not claim item: ' + error.message);
+  }
+};
 
   if (loading) {
     return (
