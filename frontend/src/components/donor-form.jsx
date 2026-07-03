@@ -26,21 +26,26 @@ export default function DonorForm({ isOpen, onClose, session}) {
       [name]: value,
     }));
   };
+   
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+  
+ 
 
     try {
+      const expirationInUTC = new Date(formData.expirationTime).toISOString();
       const { error } = await supabase
         .from('donations')
         .insert([
           {
             food_type: formData.foodDescription,
             quantity: formData.quantity,
-            expiration_time: formData.expirationTime,
+            expiration_time: expirationInUTC,
             pickup_location: formData.pickupAddress,
             email: session?.user?.email || null,
+            status: "available"
           },
         ]);
 
