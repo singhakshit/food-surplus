@@ -1,5 +1,6 @@
 "use client";
 
+import { MapPin, Navigation, Loader2 } from 'lucide-react';
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
@@ -10,14 +11,16 @@ import { X, Plus } from "lucide-react";
 import { supabase } from '../lib/supabaseClient';
 
 export default function DonorForm({ isOpen, onClose, session}) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   const [formData, setFormData] = useState({
     foodDescription: "",
     quantity: "",
     pickupAddress: "",
     expirationTime: "",
+    lat: null,
+    lng: null
   });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -26,13 +29,67 @@ export default function DonorForm({ isOpen, onClose, session}) {
       [name]: value,
     }));
   };
-   
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      alert("📍 Geolocation is not supported by your current browser profile.");
+      return;
+    }
+
+    setIsLocating(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        setFormData((prev) => ({
+          ...prev,
+          lat: latitude,
+          lng: longitude
+        }));
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await response.json();
+          
+          if (data && data.display_name) {
+            setFormData((prev) => ({
+              ...prev,
+              pickupAddress: data.display_name
+            }));
+          }
+        } catch (err) {
+          console.error("Error converting coordinates to text address:", err);
+          setFormData((prev) => ({
+            ...prev,
+            pickupAddress: `📍 Position: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+          }));
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (error) => {
+        console.error("GPS Access Denied:", error);
+        setIsLocating(false);
+        alert("🔒 Location Access Denied. Please enable location permissions.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+    
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.lat || !formData.lng) {
+      alert("⚠️ Location missing! Please use the 'Use Current Location' button to lock onto your pickup position.");
+      return;
+    }
+
     setIsSubmitting(true);
-  
- 
 
     try {
       const expirationInUTC = new Date(formData.expirationTime).toISOString();
@@ -44,6 +101,8 @@ export default function DonorForm({ isOpen, onClose, session}) {
             quantity: formData.quantity,
             expiration_time: expirationInUTC,
             pickup_location: formData.pickupAddress,
+            lat: formData.lat, 
+            lng: formData.lng,
             email: session?.user?.email || null,
             status: "available"
           },
@@ -56,6 +115,8 @@ export default function DonorForm({ isOpen, onClose, session}) {
         quantity: "",
         pickupAddress: "",
         expirationTime: "",
+        lat: null,
+        lng: null
       });
 
       onClose();
@@ -77,6 +138,7 @@ export default function DonorForm({ isOpen, onClose, session}) {
           onClick={onClose}
           className="absolute top-4 right-4 p-1 hover:bg-muted rounded-lg transition-colors"
           aria-label="Close form"
+          type="button"
         >
           <X className="w-5 h-5 text-muted-foreground" />
         </button>
@@ -120,19 +182,53 @@ export default function DonorForm({ isOpen, onClose, session}) {
               />
             </div>
 
+            {/* ADDRESS CONTAINER & HARDWARE GPS PROMPT INTERFACE */}
             <div className="space-y-2">
               <Label htmlFor="pickupAddress" className="text-base font-medium">
                 Pickup Address
               </Label>
-              <Input
-                id="pickupAddress"
-                name="pickupAddress"
-                type="text"
-                placeholder="Street address, city, state, zip..."
-                value={formData.pickupAddress}
-                onChange={handleInputChange}
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="pickupAddress"
+                  name="pickupAddress"
+                  type="text"
+                  placeholder="Street address or click button below to fetch..."
+                  value={formData.pickupAddress}
+                  onChange={handleInputChange}
+                  required
+                  className="pr-10"
+                />
+                <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              </div>
+              
+              {/* 🛰️ Trigger Button for hardware tracking coordinates */}
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={handleGetLocation}
+                disabled={isLocating}
+                className="w-full flex items-center justify-center gap-2 mt-1.5"
+              >
+                {isLocating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Triangulating Coordinates...
+                  </>
+                ) : (
+                  <>
+                    <Navigation className="w-4 h-4" />
+                    Use Current Location
+                  </>
+                )}
+              </Button>
+
+              {/* Success Badge */}
+              {formData.lat && (
+                <p className="text-xs text-emerald-600 font-medium pt-0.5 animate-fade-in">
+                  ✨ Coordinates Locked: {formData.lat.toFixed(4)}, {formData.lng.toFixed(4)}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -166,7 +262,7 @@ export default function DonorForm({ isOpen, onClose, session}) {
               >
                 {isSubmitting ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
                     Submitting...
                   </>
                 ) : (
