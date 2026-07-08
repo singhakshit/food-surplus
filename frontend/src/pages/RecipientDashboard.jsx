@@ -101,29 +101,41 @@ export default function RecipientDashboard() {
     };
   }, []);
 
-  const handleClaimDonation = async (donationId) => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        alert("Secure Access: Please sign in or register an account to claim community food donations.");
-        navigate("/login");
-        return;
-      }
-
-      const { error } = await supabase
-        .from('donations')
-        .update({ 
-          status: 'claimed',
-          claimed_by: session.user.email
-        })
-        .eq('id', donationId);
-
-      if (error) throw error;
-      alert('Food item successfully claimed! Coordinate your collection logistics.');
-    } catch (error) {
-      console.error('Error claiming donation:', error);
+  const handleClaimDonation = async (donation) => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      alert("Secure Access: Please sign in to claim donations.");
+      navigate("/login");
+      return;
     }
-  };
+
+    const { error } = await supabase
+      .from('donations')
+      .update({ 
+        status: 'claimed',
+        claimed_by: session.user.email 
+      })
+      .eq('id', donation.id);
+
+    if (error) throw error;
+
+    const donorPhone = donation.phone; 
+    
+    const initialMessage = `Hello! I just claimed your surplus food listing "${donation.food_type}" on the Food Share App. I am inside the 5km radius circle and can come by for self-pickup. Let me know what time works best!`;
+    
+    const encodedMessage = encodeURIComponent(initialMessage);
+    const whatsappUrl = `https://wa.me/${donorPhone}?text=${encodedMessage}`;
+
+    alert('🎉 Food item successfully claimed! Redirecting you to WhatsApp to coordinate pickup logistics with the donor.');
+
+    window.open(whatsappUrl, '_blank');
+
+  } catch (error) {
+    console.error('Error claiming donation:', error);
+    alert('Could not claim item: ' + error.message);
+  }
+};
 
   if (loading) {
     return (
@@ -191,7 +203,7 @@ export default function RecipientDashboard() {
                 </div>
 
                 <button
-                  onClick={() => handleClaimDonation(donation.id)}
+                  onClick={() => handleClaimDonation(donation)}
                   className="w-full mt-4 py-2 px-4 bg-green-700 hover:bg-green-800 text-white font-medium rounded-lg text-sm text-center transition-colors flex items-center justify-center gap-2"
                 >
                   <CheckCircle className="w-4 h-4" />

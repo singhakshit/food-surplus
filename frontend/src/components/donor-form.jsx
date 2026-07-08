@@ -101,6 +101,7 @@ export default function DonorForm({ isOpen, onClose, session}) {
             quantity: formData.quantity,
             expiration_time: expirationInUTC,
             pickup_location: formData.pickupAddress,
+            phone: formData.phone,
             lat: formData.lat, 
             lng: formData.lng,
             email: session?.user?.email || null,
@@ -114,6 +115,7 @@ export default function DonorForm({ isOpen, onClose, session}) {
         foodDescription: "",
         quantity: "",
         pickupAddress: "",
+        phone: "", 
         expirationTime: "",
         lat: null,
         lng: null
@@ -200,8 +202,11 @@ export default function DonorForm({ isOpen, onClose, session}) {
                 />
                 <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               </div>
+
+            
               
               {/* 🛰️ Trigger Button for hardware tracking coordinates */}
+              
               <Button
                 type="button"
                 variant="secondary"
@@ -223,12 +228,26 @@ export default function DonorForm({ isOpen, onClose, session}) {
                 )}
               </Button>
 
-              {/* Success Badge */}
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-base font-medium">
+                Phone Number (+91)
+              </Label>
+              <Input
+                id="phone"
+                name="phone"
+                type="text"
+                value={formData.phone}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+              {/* Success Badge
               {formData.lat && (
                 <p className="text-xs text-emerald-600 font-medium pt-0.5 animate-fade-in">
                   ✨ Coordinates Locked: {formData.lat.toFixed(4)}, {formData.lng.toFixed(4)}
                 </p>
-              )}
+              )} */}
             </div>
 
             <div className="space-y-2">
