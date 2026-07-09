@@ -3,15 +3,15 @@
 import { useEffect, useState } from "react";
 import { Apple, Truck, MapPin, Leaf } from "lucide-react";
 
-interface StatCardProps {
-  icon: React.ReactNode;
-  value: number;
-  suffix: string;
-  label: string;
-  delay: number;
-}
+// interface StatCardProps {
+//   icon: React.ReactNode;
+//   value: number;
+//   suffix: string;
+//   label: string;
+//   delay: number;
+// }
 
-function StatCard({ icon, value, suffix, label, delay }: StatCardProps) {
+function StatCard({ icon, value, suffix, label, delay }) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {

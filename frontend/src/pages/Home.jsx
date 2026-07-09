@@ -1,8 +1,8 @@
 import { Header } from "../components/header"; 
 import { HeroSection } from "../components/hero-section";
-import { ImpactStats } from "../components/impact-stats";
+import { ImpactStats } from "../components/impact-stats.jsx";
 import { PortalsSection } from "../components/portals-section";
-import { Footer } from "../components/footer";
+import { Footer } from "../components/footer.jsx";
 
 export default function Home({ session }) {
   return (
