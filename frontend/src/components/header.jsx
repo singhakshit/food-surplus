@@ -69,11 +69,11 @@ export function Header({ session }) {
             </a>
 
             {/* Display Donor Dashboard link dynamically if logged in */}
-            {session && (
+            {/* {session && (
               <Link to="/donor" className="text-muted-foreground hover:text-foreground transition-colors text-sm font-medium no-underline">
                 Donor Portal
               </Link>
-            )}
+            )} */}
           </nav>
 
           {/* Desktop Auth Toggle Section */}
@@ -145,7 +145,7 @@ export function Header({ session }) {
             >
               Portals
             </a>
-            {session && (
+            {/* {session && (
               <Link 
                 to="/donor" 
                 className="text-muted-foreground hover:text-foreground transition-colors text-sm font-medium no-underline"
@@ -153,7 +153,7 @@ export function Header({ session }) {
               >
                 Donor Portal
               </Link>
-            )}
+            )} */}
 
             {/* Mobile Auth Section */}
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
